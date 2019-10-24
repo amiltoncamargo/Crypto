@@ -1,0 +1,31 @@
+#!/bin/bash
+
+WHITE="\033[0m"
+YELLOW="\033[33m"
+RED="\033[31m"
+
+clear
+
+DIR=$(printf %q "$( dirname "${BASH_SOURCE[0]}" )") # Get the current folder, spaces escaped
+XCODE_PATH=( "$( xcode-select --print-path )" )
+
+echo -e "${RED}Verifying if Command Line Tools are installed...${WHITE}"
+xcode-select --install &> /dev/null
+echo -e "${YELLOW}Using XCode from $XCODE_PATH ..."
+echo -e "${RED}** Note: if you want to change it, run before this script: sudo xcode-select -switch /Applications/Xcode##.app"
+echo -e "** Where ## is the number version of your installed XCode.${WHITE}"
+
+# Without using eval, it will never work if there are spaces in folder path!
+
+FOLDER=~/Library/Developer/Xcode/DerivedData/
+eval chmod -R 777 ${FOLDER}
+
+echo -e "${YELLOW}Building project...${WHITE}"
+
+eval cd ${DIR}
+
+#xcodebuild -list -workspace Crypto.xcworkspace
+#xcodebuild -list -project Crypto.xcodeproj clean analyze
+xcodebuild -quiet -scheme "Crypto-iOS" -destination generic/platform=iOS build
+
+echo -e "${YELLOW}Done!${WHITE}"
